@@ -1,27 +1,14 @@
 services:
-  # Backend Web Service
+  # Unified Fullstack Service
   - type: web
-    name: college-api
+    name: college-platform
     runtime: node
-    buildCommand: npm install
-    startCommand: npx ts-node index.ts
-    rootDir: server
+    buildCommand: npm install && npm run build --prefix client && npm run build --prefix server
+    startCommand: npm start --prefix server
     envVars:
       - key: JWT_SECRET
         generateValue: true
       - key: DATABASE_URL
         value: file:./dev.db
-      - key: PORT
-        value: 5000
-
-  # Frontend Static Site
-  - type: static_site
-    name: college-frontend
-    buildCommand: npm install && npm run build --prefix client
-    publishPath: client/dist
-    envVars:
       - key: VITE_API_BASE
-        fromService:
-          name: college-api
-          type: web
-          property: host
+        value: "" # Empty means use relative paths
