@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("STUDENT") // STUDENT, FACULTY, ADMIN
+  facultyInfo  FacultyProfile?
+  notes        Note[]
+}
+
+model BusRoute {
+  id        String   @id @default(uuid())
+  name      String
+  buses     Bus[]
+  stops     Stop[]
+}
+
+model Bus {
+  id         String   @id @default(uuid())
+  name       String
+  routeId    String
+  route      BusRoute @relation(fields: [routeId], references: [id])
+  currentLat Float
+  currentLng Float
+  nextStopId String?
+  status     String   @default("ON_TIME") // ON_TIME, DELAYED
+}
+
+model Stop {
+  id      String   @id @default(uuid())
+  name    String
+  lat     Float
+  lng     Float
+  routeId String
+  route   BusRoute @relation(fields: [routeId], references: [id])
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  category    String
+}
+
+model FacultyProfile {
+  id            String  @id @default(uuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id])
+  department    String
+  title         String
+  officeHours   String
+  contactEmail  String
+  contactPhone  String
+  imageUrl      String?
+}
+
+model Note {
+  id         String   @id @default(uuid())
+  title      String
+  content    String
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id])
+  courseCode String
+  createdAt  DateTime @default(now())
+}
