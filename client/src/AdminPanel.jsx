@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5000') + '/api';
 
 export default function AdminPanel({ token }) {
     const [events, setEvents] = useState([]);
