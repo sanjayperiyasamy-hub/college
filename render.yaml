@@ -15,9 +15,8 @@ services:
         value: 5000
 
   # Frontend Static Site
-  - type: static
+  - type: static_site
     name: college-frontend
-    runtime: static
     buildCommand: npm install && npm run build --prefix client
     publishPath: client/dist
     envVars:
