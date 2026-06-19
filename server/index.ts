@@ -46,8 +46,11 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
         }
 
         const user = await prisma.user.findUnique({ where: { email } });
-        if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+        if (!user) {
+            return res.status(401).json({ error: 'USER_NOT_FOUND' });
+        }
+        if (!(await bcrypt.compare(password, user.passwordHash))) {
+            return res.status(401).json({ error: 'INVALID_PASSWORD' });
         }
         const token = jsonwebtoken.sign({ id: user.id, role: user.role }, JWT_SECRET);
         res.json({ token, user: { id: user.id, name: user.name, role: user.role } });

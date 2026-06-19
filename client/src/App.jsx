@@ -250,16 +250,19 @@ const AuthPage = () => {
     const res = await login(email, password);
     if (res.success) return;
 
-    if (res.code === 'DATABASE_EMPTY') {
-      setError('Database is empty. Initializing system...');
+    if (res.code === 'DATABASE_EMPTY' || res.code === 'USER_NOT_FOUND') {
+      const why = res.code === 'DATABASE_EMPTY' ? 'Database empty' : 'First user not found';
+      setError(`${why}. Initializing system...`);
       try {
         await axios.post(`${API_BASE}/debug/seed`);
-        setError('System initialized! You can now login with the default credentials.');
+        setError('System initialized! Please login again.');
       } catch {
-        setError('Failed to initialize database. Check server logs.');
+        setError('Initialization failed. Check server logs.');
       }
+    } else if (res.code === 'INVALID_PASSWORD') {
+      setError('Incorrect password. Try password123');
     } else {
-      setError('Invalid credentials. Try admin@college.edu / password123');
+      setError('Login failed. Ensure server is running.');
     }
   };
 
@@ -267,13 +270,19 @@ const AuthPage = () => {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
       <form onSubmit={handleLogin} className="glass-panel" style={{ width: '400px' }}>
         <h2 className="title" style={{ fontSize: '1.4rem', textAlign: 'center' }}>Nagarathinam Angalammal<br />Arts and Science College</h2>
-        {error && <p style={{ color: 'var(--danger)', marginBottom: '1rem' }}>{error}</p>}
+        {error && <p style={{ color: 'var(--accent)', marginBottom: '1rem', border: '1px solid var(--border-color)', padding: '0.5rem', borderRadius: '4px' }}>{error}</p>}
         <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
         <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
         <button type="submit" style={{ width: '100%' }}>Login Area</button>
-        <p style={{ marginTop: '1rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textAlign: 'center' }}>
-          Auto-seed happens on login if no data exists. <br />Default emails: student@college.edu OR admin@college.edu <br />Password: password123
-        </p>
+        <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', textAlign: 'center' }}>
+            <strong>Demo Credentials:</strong><br />
+            admin@college.edu / password123
+          </p>
+          <button type="button" onClick={() => axios.post(`${API_BASE}/debug/seed`).then(() => setError('System seeded manually!'))} style={{ background: 'transparent', color: 'var(--accent)', fontSize: '0.7rem', width: '100%', border: 'none', textDecoration: 'underline', marginTop: '0.5rem', cursor: 'pointer' }}>
+            Force Manual Database Seed
+          </button>
+        </div>
       </form>
     </div>
   );
