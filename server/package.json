@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node index.ts",
-    "build": "npx prisma generate && npx prisma db push --accept-data-loss && tsc",
+    "build": "npx prisma generate && tsc",
     "start": "node index.js"
   },
   "keywords": [],

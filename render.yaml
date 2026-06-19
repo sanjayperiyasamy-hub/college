@@ -4,7 +4,7 @@ services:
     name: college-platform
     runtime: node
     buildCommand: npm install && npm run build --prefix client && npm run build --prefix server
-    startCommand: npm start --prefix server
+    startCommand: npx prisma db push --accept-data-loss --schema server/prisma/schema.prisma && npm start --prefix server
     envVars:
       - key: JWT_SECRET
         generateValue: true
