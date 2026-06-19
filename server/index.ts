@@ -12,6 +12,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Request logger
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', time: new Date() });
+});
+
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret123';
 
