@@ -40,6 +40,11 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
 app.post('/api/auth/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
     try {
+        const userCount = await prisma.user.count();
+        if (userCount === 0) {
+            return res.status(401).json({ error: 'DATABASE_EMPTY' });
+        }
+
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
             return res.status(401).json({ error: 'Invalid credentials' });

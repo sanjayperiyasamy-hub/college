@@ -31,10 +31,10 @@ const AuthProvider = ({ children }) => {
       setToken(res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       localStorage.setItem('token', res.data.token);
-      // Auto seed for demo
-      await axios.post(`${API_BASE}/debug/seed`);
-      return true;
-    } catch { return false; }
+      return { success: true };
+    } catch (err) {
+      return { success: false, code: err.response?.data?.error };
+    }
   };
   const logout = () => {
     setUser(null); setToken(null);
@@ -246,8 +246,21 @@ const AuthPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
     const res = await login(email, password);
-    if (!res) setError('Invalid credentials or server not seeded. Try admin@college.edu / password123');
+    if (res.success) return;
+
+    if (res.code === 'DATABASE_EMPTY') {
+      setError('Database is empty. Initializing system...');
+      try {
+        await axios.post(`${API_BASE}/debug/seed`);
+        setError('System initialized! You can now login with the default credentials.');
+      } catch {
+        setError('Failed to initialize database. Check server logs.');
+      }
+    } else {
+      setError('Invalid credentials. Try admin@college.edu / password123');
+    }
   };
 
   return (
